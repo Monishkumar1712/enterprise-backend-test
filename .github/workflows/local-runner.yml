@@ -3,7 +3,10 @@ name: Deploy Enterprise Backend
 on:
   push:
     branches: [main]
-  
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - '.github/workflows/enterprise-backend-deploy.yml'
   pull_request:
     branches: [main]
     paths:
@@ -14,24 +17,41 @@ jobs:
   deploy:
     name: Deploy enterprise-backend
     runs-on: self-hosted
+    if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
+      # Step 1 - Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      # Step 2 - Build (echo for now - will be real docker build later)
       - name: Build enterprise-backend
         run: |
           echo "Building enterprise-backend..."
-          docker build -t us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }} .
+          echo "docker build -t us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }} ."
 
+      # Step 3 - Push (echo for now - will be real docker push later)
       - name: Push image
         run: |
           echo "Pushing image for enterprise-backend..."
-          docker push us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }}
+          echo "docker push us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }}"
 
+      # Step 4 - Setup kubeconfig to connect to kind cluster
+      - name: Setup kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > ~/.kube/config
+
+      # Step 5 - Deploy via Helm using the .tgz chart
       - name: Deploy enterprise-backend to Kubernetes
         run: |
-          echo "Deploying enterprise-backend..."
           helm upgrade enterprise-backend cmrcs_enterprise_backend-1.0.0.tgz \
             --install \
             --namespace production \
             --reuse-values \
             --set image.tag=${{ github.sha }}
+
+
+├── cmrcs_enterprise_backend-1.0.0.tgz           ← copy from Downloads
+└── .github/
+    └── workflows/
+        └── enterprise-backend-deploy.yml         ← this pipeline file
