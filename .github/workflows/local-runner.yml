@@ -3,9 +3,7 @@ name: Deploy Enterprise Backend
 on:
   push:
     branches: [main]
-    paths:
-      - 'src/**'
-      - 'Dockerfile'
+  
   pull_request:
     branches: [main]
     paths:
