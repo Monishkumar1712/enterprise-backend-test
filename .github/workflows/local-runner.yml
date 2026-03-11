@@ -23,6 +23,7 @@ jobs:
       - name: Build enterprise-backend
         run: |
           echo "Building enterprise-backend..."
+          sleep 60
           # docker build -t us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }} ."
 
       - name: Push image
