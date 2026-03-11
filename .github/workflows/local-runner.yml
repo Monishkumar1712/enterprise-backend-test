@@ -51,7 +51,3 @@ jobs:
             --set image.tag=${{ github.sha }}
 
 
-├── cmrcs_enterprise_backend-1.0.0.tgz           ← copy from Downloads
-└── .github/
-    └── workflows/
-        └── enterprise-backend-deploy.yml         ← this pipeline file
