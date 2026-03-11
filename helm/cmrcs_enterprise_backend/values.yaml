@@ -1,7 +1,7 @@
 global:
   default: default
 
-name: cmrcs_enterprise_backend
+name: cmrcs-enterprise-backend
 
 namespace: default
 
