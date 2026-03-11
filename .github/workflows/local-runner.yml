@@ -6,7 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'Dockerfile'
-      - '.github/workflows/enterprise-backend-deploy.yml'
+      - '.github/workflows/local-runner.yml'
   pull_request:
     branches: [main]
     paths:
