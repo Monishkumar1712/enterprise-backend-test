@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'Dockerfile'
+      - '.github/workflows/enterprise-backend-deploy.yml'
   pull_request:
     branches: [main]
     paths:
@@ -17,31 +18,25 @@ jobs:
     name: Deploy enterprise-backend
     runs-on: self-hosted
     if: github.ref == 'refs/heads/main'
-
     steps:
-      # Step 1 - Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2 - Build
       - name: Build enterprise-backend
         run: |
           echo "Building enterprise-backend..."
           echo "docker build -t us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }} ."
 
-      # Step 3 - Push
       - name: Push image
         run: |
           echo "Pushing image for enterprise-backend..."
           echo "docker push us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }}"
 
-      # Step 4 - Setup kubeconfig
       - name: Setup kubeconfig
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > ~/.kube/config
 
-      # Step 5 - Deploy using Helm
       - name: Deploy enterprise-backend to Kubernetes
         run: |
           helm upgrade enterprise-backend cmrcs_enterprise_backend-1.0.0.tgz \
@@ -49,3 +44,9 @@ jobs:
             --namespace production \
             --reuse-values \
             --set image.tag=${{ github.sha }}
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/enterprise-backend \
+            -n production \
+            --timeout=120s
