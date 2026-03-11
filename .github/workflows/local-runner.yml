@@ -12,7 +12,6 @@ on:
     paths:
       - 'src/**'
       - 'Dockerfile'
-
 jobs:
   deploy:
     name: Deploy enterprise-backend
