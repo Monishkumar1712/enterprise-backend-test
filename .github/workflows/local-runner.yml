@@ -1,5 +1,4 @@
 name: Deploy Enterprise Backend
-
 on:
   push:
     branches: [main]
@@ -24,17 +23,17 @@ jobs:
       - name: Build enterprise-backend
         run: |
           echo "Building enterprise-backend..."
-          echo "docker build -t us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }} ."
+          # docker build -t us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }} ."
 
       - name: Push image
         run: |
           echo "Pushing image for enterprise-backend..."
-          echo "docker push us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }}"
+          # docker push us-central1-docker.pkg.dev/devops-438908/gcf-artifacts/enterprise-be:${{ github.sha }}"
 
-      - name: Setup kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > ~/.kube/config
+      # - name: Setup kubeconfig
+      #  run: |
+      # mkdir -p ~/.kube
+        #  echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > ~/.kube/config
 
       - name: Deploy enterprise-backend to Kubernetes
         run: |
