@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}-deployment
+  labels:
+    app: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      labels:
+        app.kubernetes.io/name: {{ .Values.name }}
+        app: {{ .Values.name }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.image.PullSecrets }}
+      containers:
+        - name: {{ .Values.name }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.PullPolicy }}
+          ports:
+            - containerPort: {{ .Values.ports.containerPort }}
+          {{- if .Values.resources.enabled }}
+          resources:
+            requests:
+              cpu: {{ .Values.resources.cpu.request | quote }}
+            limits:
+              cpu: {{ .Values.resources.cpu.limit | quote }}
+          {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.name }}-secret
+          volumeMounts:
+          - name: {{ .Values.name }}-configmap-file
+            mountPath: /usr/src/api/.env
+            subPath: .env
+            readOnly: true
+      volumes:
+      - name: {{ .Values.name }}-configmap-file
+        configMap:
+          name: {{ .Values.name }}-configmap
+          items:
+          - key: enterprise.properties
+            path: .env
+

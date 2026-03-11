@@ -1,0 +1,96 @@
+global:
+  default: default
+
+name: cmrcs_enterprise_backend
+
+namespace: default
+
+replicas: 1
+
+image:
+  registry: us-central1-docker.pkg.dev/devops-438908
+  name: gcf-artifacts/enterprise-be
+  PullPolicy: IfNotPresent
+  PullSecrets: regcred
+  tag: latest
+
+ports:
+  servicePort: 3000
+  containerPort: 3000
+  nodePort: 31195
+
+service:
+  type: ClusterIP 
+
+resources:
+  enabled: true
+  cpu:
+    request: 150m
+    limit: 175m
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 75
+
+pdb:
+  enabled: true
+  maxUnavailable: 1
+
+secret:
+  BOOTSTRAP_SECRET: ZHJhZ29uZmx5LXBsYXRmb3JtLWJvb3RzdHJhcC0yMDI2LXNlY3VyZQ==
+  REDIS_PASSWORD: 
+  DB_USERNAME: cmNzX3VzZXI=
+  DB_PASSWORD: MDlZaTEkMjM0NQ==
+  DB_ROOT_PASSWORD: UmV6QFI4Mzh3JA==
+  KEYCLOAK_CLIENT_ID: cmNzLWFwaQ==
+  KEYCLOAK_CLIENT_SECRET: dHYwYm5yY0xGdTJvSG9ocmV2WDN4MTFubHpXcHNIYnM=
+  KEYCLOAK_ADMIN_CLIENT_ID: YWRtaW4tY2xp
+  KEYCLOAK_ADMIN_CLIENT_SECRET: WXhIVDMxZ0Y4c0J6UUQyZ2pYSVg1dEdnOEFpVmN1V3kK
+  SMTP_USER: cHJvZHVjdC5ub3RpZmljYXRpb24yQG9wZW50dXJmLmlu
+  SMTP_PASS: KClQM243dTZmITIwMjM=
+
+configmap:
+  NODE_ENV: development
+  PORT: 3000
+  CORS_ORIGINS: http://platform.celmedia.com,http://enterprise.celmedia.com,http://localhost:9090,http://localhost:9091
+  REDIS_HOST: host.minikube.internal
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: 
+  DB_HOST: host.minikube.internal
+  DB_PORT: 3306
+  DB_DATABASE: rcs_enterprise
+  DB_LOGGING: true
+  KEYCLOAK_AUTH_SERVER_URL: http://host.minikube.internal:8080
+  KEYCLOAK_REALM: rcs-platform
+  KEYCLOAK_ADMIN_REALM: master
+  INVITE_TOKEN_EXPIRY_DAYS: 7
+  DEFAULT_TPS: 10
+  MAX_BURST_SIZE: 50
+  FEATURE_WEBHOOKS: true
+  FEATURE_AUDIT: true
+  FEATURE_SMS: false
+  FEATURE_WHATSAPP: false
+  STORAGE_PROVIDER: local
+  LOCAL_STORAGE_PATH: /uploads
+  SMTP_HOST: smtp.zoho.com
+  SMTP_PORT: 465
+  SMTP_SECURE: true
+  EMAIL_FROM: product.notification2@openturf.in
+  EMAIL_FROM_NAME: RCS Platform
+  EMAIL_ENABLED: true
+  EMAIL_DEBUG: false
+  FRONTEND_URL: http://enterprise.celmedia.com
+  DB_SYNCHRONIZE: false
+  OTEL_ENABLED: false
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://host.minikube.internal:4317
+  LOG_LEVEL: debug
+  OTEL_TRACES_EXPORTER: otlp
+  SMS_ADAPTER_CHANNEL: SMS_SMPP
+  SMS_ADAPTER_PROVIDER_ID: provider-sms-smpp-001
+  SMS_ADAPTER_ROUTE_ID: route-sms-smpp-001
+  RCS_ADAPTER_PROVIDER_ID: provider-rcs-maap-001
+  RCS_ADAPTER_ROUTE_ID: route-rcs-maap-001
+  PUBLIC_BASE_URL: http://enterprise.celmedia.com/api/
